@@ -1,10 +1,11 @@
 #ifndef HTTP_SERVER_REQUEST_PARSER_HPP
 #define HTTP_SERVER_REQUEST_PARSER_HPP
 
+#include <tuple>
+
 namespace http {
 namespace server {
 
-#include <tuple>
 struct request;
 
 class request_parser
@@ -14,6 +15,8 @@ public:
 
 	void reset();
 
+	unsigned int content_length_ {0u};
+	bool chunked_ {false};
 	enum result_type { good, bad, indeterminate };
 	
 	template<typename InputIterator>
@@ -35,6 +38,7 @@ private:
 	static bool is_tspecial(int c);
 	static bool is_digit(int c);
 	static bool is_ctl(int c);
+	static int unhex(char c);
 
 	enum state
 	{
@@ -58,7 +62,15 @@ private:
 		space_before_header_value,
 		header_value,
 		expecting_newline_2,
-		expecting_newline_3
+		expecting_newline_3,
+		chunk_size_start,
+		chunk_size,
+		chunk_parameters,
+		chunk_size_almost_done, //change to expecting new line
+		chunk_data,
+		chunk_data_almost_done,
+		chunk_data_done,
+		body_identity
 	} state_;
 };
 

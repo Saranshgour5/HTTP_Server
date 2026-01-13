@@ -15,6 +15,7 @@ struct request
 	int http_version_major;
 	int http_version_minor;
 	std::vector<header> headers;
+	std::vector<char> content;
 };
 
 }
